@@ -1,8 +1,4 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
-## Getting Started
-
-First, run the development server:
+## How to reproduce
 
 ```bash
 npm run dev
@@ -12,23 +8,33 @@ yarn dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+Inspect your page, and make sure to open the `console` tab in your browser to see logs.
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+### Happy path
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+If you click on the first link.
 
-## Learn More
+Both SRR and client side `asPath` matches when using `getServerSideProps` - no error is shown in the logs.
 
-To learn more about Next.js, take a look at the following resources:
+### Issue with `asPath`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+If you return back, and click on the second link you should see the following error in your console:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+```console
+next-dev.js?3515:32 Warning: Text content did not match. Server: "/test-static/123" Client: "/test-statique/123"
+    at div
+    at TestStatic (webpack-internal:///./pages/test-static/[id].tsx:16:72)
+    at MyApp (webpack-internal:///./pages/_app.tsx:36:27)
+    at StyleRegistry (webpack-internal:///./node_modules/styled-jsx/dist/stylesheet-registry.js:231:34)
+    at ErrorBoundary (webpack-internal:///./node_modules/@next/react-dev-overlay/lib/internal/ErrorBoundary.js:26:47)
+    at ReactDevOverlay (webpack-internal:///./node_modules/@next/react-dev-overlay/lib/internal/ReactDevOverlay.js:90:23)
+    at Container (webpack-internal:///./node_modules/next/dist/client/index.js:356:9)
+    at AppContainer (webpack-internal:///./node_modules/next/dist/client/index.js:795:26)
+    at Root (webpack-internal:///./node_modules/next/dist/client/index.js:916:27)
 
-## Deploy on Vercel
+See more info here: https://nextjs.org/docs/messages/react-hydration-error
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+If you do a `view page source` you will see that the SSR markup is `/test-static/123` when in fact it should be using `/test-statique/123` as per the `redirects` configuration in `next.config.js`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+It appears that when using `getStaticProps` and `getStaticPaths`, the the redirect resolution is not done as it is on the happy path.
