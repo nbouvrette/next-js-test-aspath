@@ -14,7 +14,7 @@ Inspect your page, and make sure to open the `console` tab in your browser to se
 
 If you click on the first link.
 
-Both SRR and client side `asPath` matches when using `getServerSideProps` - no error is shown in the logs.
+Both SSR and client side `asPath` matches when using `getServerSideProps` - no error is shown in the logs.
 
 ### Issue with `asPath`
 
