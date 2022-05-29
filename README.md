@@ -1,3 +1,9 @@
+## ℹ️ May 29th 2022 update
+
+As per https://github.com/vercel/next.js/issues/32772 this behavior is by design:
+
+> If you need the `asPath` to match uniquely to each request then `getServerSideProps` should be used. `getStaticProps` is not meant to be unique per request but instead unique per-path.
+
 ## How to reproduce
 
 ```bash
